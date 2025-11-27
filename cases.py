@@ -429,29 +429,6 @@ CASES.update({
     # 2018 CASES
     # ---------------------------
 
-    "Fracture Case": {
-        "price": 0.70,
-        "items": {
-            "Mil-Spec": [
-                ("Galil AR | Fracture Blue", "blue"),
-                ("P250 | Fracture Rust", "blue")
-            ],
-            "Restricted": [
-                ("CZ75 | Fracture Grid", "purple"),
-                ("MAC-10 | Fracture Viper", "purple")
-            ],
-            "Classified": [
-                ("AUG | Fracture Pulse", "pink")
-            ],
-            "Covert": [
-                ("AK-47 | Fracture Blade", "red")
-            ],
-            "Rare Special": [
-                ("★ Knife | Fracture", "gold")
-            ]
-        }
-    },
-
     "Shattered Web Case": {
         "price": 1.50,
         "items": {
