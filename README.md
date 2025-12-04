@@ -1,3 +1,2 @@
 # case-opening
-mäng
-Kõik skinnid ei ole täpselt, et hetkel võib leiduda vigasid, et kõik pole täpsed.
+Cs2 case opening mäng, kus sul on võimalus avada hetkel 10 erinevat case.
