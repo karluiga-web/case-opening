@@ -32,12 +32,13 @@ RARITY_CHANCES = {
     "Rare Special": 0.0026
 }
 
-STATTRAK_CHANCES = {
-    "Mil-Spec": 0.0799,
-    "Restricted": 0.0160,
-    "Classified": 0.0032,
-    "Covert": 0.0006,
-    "Rare Special": 0.0003
+# 1 in X StatTrak süsteem
+STATTRAK_ONE_IN = {
+    "Mil-Spec": 10,
+    "Restricted": 12,
+    "Classified": 15,
+    "Covert": 20,
+    "Rare Special": 40
 }
 
 KEY_PRICE = 2.49   # Real CS2 key cost
@@ -126,11 +127,13 @@ class CaseGame:
         self.money_spent = 0.0
         self.money_earned_from_selling = 0.0
         self.tradeups_done = 0
+        self.stattrak_drops = 0
         self.drops_by_rarity = {r: 0 for r in self.rarities}
 
         # achievements definition: (key, title, condition)
         self.achievements_def = [
             ("first_case", "First Case Opened", lambda s: s.cases_opened >= 1),
+            ("first_stattrak", "First StatTrak\u2122 Drop", lambda s: s.stattrak_drops >= 1),
             ("cases_100", "100 Cases Opened", lambda s: s.cases_opened >= 100),
             ("first_covert", "First Covert Drop", lambda s: s.drops_by_rarity.get("Covert", 0) >= 1),
             ("first_gold", "First Rare Special Drop", lambda s: s.drops_by_rarity.get("Rare Special", 0) >= 1),
@@ -177,6 +180,7 @@ class CaseGame:
         self.stats_spent_label = None
         self.stats_earned_label = None
         self.stats_tradeups_label = None
+        self.stats_st_label = None
         self.stats_drops_label = None
         self.stats_prestige_label = None
         self.achievements_box = None
@@ -328,6 +332,7 @@ class CaseGame:
                     "money_spent": self.money_spent,
                     "money_earned_from_selling": self.money_earned_from_selling,
                     "tradeups_done": self.tradeups_done,
+                    "stattrak_drops": self.stattrak_drops,
                     "drops_by_rarity": self.drops_by_rarity,
                 },
                 "achievements_unlocked": list(self.achievements_unlocked),
@@ -374,6 +379,7 @@ class CaseGame:
         self.money_spent = float(stats.get("money_spent", 0.0))
         self.money_earned_from_selling = float(stats.get("money_earned_from_selling", 0.0))
         self.tradeups_done = int(stats.get("tradeups_done", 0))
+        self.stattrak_drops = int(stats.get("stattrak_drops", 0))
         drops = stats.get("drops_by_rarity", {})
         for r in self.rarities:
             self.drops_by_rarity[r] = int(drops.get(r, 0))
@@ -611,6 +617,8 @@ class CaseGame:
         self.stats_tradeups_label.pack(fill="x")
         self.stats_prestige_label = tk.Label(stats_frame, text="", font=("Arial", 11), anchor="w")
         self.stats_prestige_label.pack(fill="x")
+        self.stats_st_label = tk.Label(stats_frame, text="", font=("Arial", 11), anchor="w")
+        self.stats_st_label.pack(fill="x")
         self.stats_drops_label = tk.Label(stats_frame, text="", font=("Arial", 11), anchor="w", justify="left")
         self.stats_drops_label.pack(fill="x", pady=(4, 0))
 
@@ -651,6 +659,7 @@ class CaseGame:
         self.stats_spent_label = None
         self.stats_earned_label = None
         self.stats_tradeups_label = None
+        self.stats_st_label = None
         self.stats_drops_label = None
         self.stats_prestige_label = None
         self.achievements_box = None
@@ -672,7 +681,8 @@ class CaseGame:
             self.stats_prestige_label.config(
                 text=f"Prestige level: {self.prestige_level} (Sell bonus: +{bonus}% per item)"
             )
-
+        if self.stats_st_label is not None:
+            self.stats_st_label.config(text=f"StatTrak drops: {self.stattrak_drops}")
         if self.stats_drops_label is not None:
             drops_text = "Drops by rarity: " + ", ".join(
                 f"{r}: {self.drops_by_rarity.get(r, 0)}" for r in self.rarities
@@ -841,6 +851,10 @@ class CaseGame:
         display = ("StatTrak\u2122 " if is_st else "") + name
         display_with_quality = f"{display} [{quality}]"
 
+        # kui trade-up tulem on StatTrak, lisa loendurisse
+        if is_st:
+            self.stattrak_drops += 1
+
         # remove used items
         for i in sorted(inv_indices, reverse=True):
             del self.inventory[i]
@@ -932,7 +946,7 @@ class CaseGame:
         items = CASES[case_name]["items"]
         rarity = self.roll_rarity()
         name, color = random.choice(items[rarity])
-        is_st = random.random() < STATTRAK_CHANCES[rarity]
+        is_st = random.randint(1, STATTRAK_ONE_IN[rarity]) == 1
         quality = roll_quality()
 
         result = {
@@ -1057,6 +1071,10 @@ class CaseGame:
         is_st = result["is_st"]
         quality = result["quality"]
         case_name = result["case_name"]
+
+        # kui drop on StatTrak, lisa loendurisse
+        if is_st:
+            self.stattrak_drops += 1
 
         display = ("StatTrak\u2122 " if is_st else "") + name
         display_with_quality = f"{display} [{quality}]"
@@ -1204,6 +1222,7 @@ class CaseGame:
         self.money_spent = 0.0
         self.money_earned_from_selling = 0.0
         self.tradeups_done = 0
+        self.stattrak_drops = 0
         self.drops_by_rarity = {r: 0 for r in self.rarities}
 
         # Clear unlocked achievements (optional)
